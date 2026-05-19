@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Badminton"/>
+<meta name="theme-color" content="#0F1117"/>
+<title>🏸 Badminton Court Ladder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0F1117;--surface:#181C27;--surface2:#1E2333;--border:#2A2F42;
+  --text:#E8EAF0;--text2:#8B90A6;--text3:#555B72;
+  --green:#3DDC84;--green-dim:#1A3D2B;
+  --orange:#FF8C42;--orange-dim:#3D2210;
+  --blue:#5B8DEF;--blue-dim:#1A2540;
+  --red:#EF5B5B;--red-dim:#3D1A1A;
+  --yellow:#F0C040;--yellow-dim:#3D3010;
+  --radius:12px;--radius-sm:8px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;overscroll-behavior:none}
+body{padding:0;padding-bottom:calc(16px + var(--safe-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch}
+#app{max-width:680px;margin:0 auto;padding:16px}
+input[type=text],input[type=number]{background:var(--surface2);border:1.5px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:15px;width:100%;outline:none;-webkit-appearance:none}
+input:focus{border-color:var(--blue)}
+button{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;min-height:44px;-webkit-appearance:none;transition:opacity .1s}
+button:active{opacity:.7}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button.ghost{background:transparent;border-color:var(--border);color:var(--text2)}
+button.danger-ghost{background:transparent;border-color:var(--red);color:var(--red)}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500;letter-spacing:.03em}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.sec-title{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;font-family:'DM Mono',monospace}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.tag-blue{background:var(--blue-dim);color:var(--blue)}
+.tag-green{background:var(--green-dim);color:var(--green)}
+.tag-yellow{background:var(--yellow-dim);color:var(--yellow)}
+.round-lbl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.07em;text-transform:uppercase;margin:1.25rem 0 .75rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.p-entry{display:flex;align-items:center;gap:8px;padding:5px 0}
+.p-entry input{flex:1}
+.rm-btn{width:36px;height:36px;min-height:36px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text3);padding:0;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.rm-btn:active{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.rt-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'DM Mono',monospace}
+.rt-table th{padding:5px;border-bottom:1px solid var(--border);color:var(--text3);font-weight:500;text-align:center;font-size:10px;white-space:nowrap}
+.rt-table th:nth-child(2){text-align:left}
+.rt-table td{padding:5px;border-bottom:1px solid var(--surface2);text-align:center;vertical-align:middle}
+.rt-table td:nth-child(2){text-align:left;font-family:'DM Sans',sans-serif;font-size:12px}
+.rt-table tr:last-child td{border-bottom:none}
+.dot-rest{width:9px;height:9px;border-radius:50%;background:var(--orange);display:inline-block}
+.dot-na{width:9px;height:9px;border-radius:50%;background:var(--border);display:inline-block}
+.stat-bar-bg{height:5px;background:var(--border);border-radius:3px;flex:1}
+.stat-bar{height:5px;border-radius:3px}
+.m-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.consec-ok{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius-sm);padding:2px 6px;font-size:10px;color:var(--green)}
+.consec-warn-y{background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius-sm);padding:2px 6px;font-size:10px;color:var(--orange)}
+.consec-warn{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius-sm);padding:2px 6px;font-size:10px;color:var(--red)}
+.divider{height:1px;background:var(--border);margin:1rem 0}
+.tab{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;color:var(--text2);background:transparent;min-height:40px}
+.tab.active{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.name-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:13px;margin:3px}
+.name-chip button{width:20px;height:20px;min-height:20px;padding:0;font-size:10px;border-radius:50%;background:transparent;border:none;color:var(--text3);cursor:pointer}
+
+/* ---- COURT LAYOUT ---- */
+/* Each round: courts on left, bench on right */
+.round-layout{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.courts-col{display:flex;flex-direction:column;gap:10px}
+.bench-col{width:110px;flex-shrink:0}
+
+/* Court card */
+.court-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;position:relative;overflow:hidden}
+.team-row{display:flex;align-items:center;gap:8px;padding:3px 0}
+.vs-badge{font-size:10px;font-weight:600;color:var(--text3);border-top:1px solid var(--border);padding-top:7px;margin:5px 0 3px;text-align:center;letter-spacing:.1em;font-family:'DM Mono',monospace}
+.win-btn{font-size:11px;padding:7px 4px;flex:1;border-radius:var(--radius-sm);min-height:38px;text-align:center;justify-content:center}
+.win-btn:active{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.lost-team{opacity:.35}
+
+/* ---- BENCH PANEL ---- */
+.bench-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;display:flex;flex-direction:column;gap:6px;position:sticky;top:8px}
+.bench-title{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:2px}
+.bench-player{
+  border-radius:var(--radius-sm);padding:7px 8px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  border:1.5px solid var(--border);background:var(--surface2);
+  transition:border-color .15s,background .15s;
+  position:relative;
+}
+.bench-player:active{opacity:.7}
+.bench-player.selected{border-color:var(--orange);background:var(--orange-dim);box-shadow:0 0 0 2px var(--orange)44}
+.bench-player .bname{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.bench-player .bcr{font-size:9px;color:var(--orange);font-family:'DM Mono',monospace}
+
+/* ---- PLAYER CHIP on court (tappable for swap) ---- */
+.player-chip{
+  display:flex;align-items:center;gap:7px;padding:4px 6px;
+  border-radius:var(--radius-sm);border:1.5px solid transparent;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  margin:1px 0;
+}
+.player-chip:active{opacity:.7}
+.player-chip.swap-target{border-color:var(--blue);background:var(--blue-dim)}
+.player-chip.swap-source{border-color:var(--orange);background:var(--orange-dim)}
+
+/* swap hint banner */
+.swap-hint{
+  background:var(--orange-dim);border:1px solid var(--orange);
+  border-radius:var(--radius-sm);padding:8px 12px;
+  font-size:12px;color:var(--orange);margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.swap-hint button{min-height:28px;padding:3px 10px;font-size:11px;background:transparent;border-color:var(--orange);color:var(--orange)}
+</style>
+</head>
+<body>
+<div id="app"><div id="root"></div></div>
+<script>
+const PAL=[
+  {bg:'#1A2F4A',tx:'#7EC8E3'},{bg:'#1A3D2B',tx:'#3DDC84'},
+  {bg:'#3D2C10',tx:'#F0A830'},{bg:'#3D1A2B',tx:'#EF5B8C'},
+  {bg:'#2A1A3D',tx:'#A78BFA'},{bg:'#1A3020',tx:'#6EE7B7'},
+  {bg:'#3D2010',tx:'#FB923C'},{bg:'#3D1A1A',tx:'#F87171'},
+  {bg:'#2A2A1A',tx:'#D4D47A'},{bg:'#1A2A3D',tx:'#60A5FA'},
+  {bg:'#1A3A3A',tx:'#34D399'},{bg:'#3A1A10',tx:'#FCA5A1'},
+  {bg:'#301A3A',tx:'#C084FC'},{bg:'#1A301A',tx:'#86EFAC'},
+  {bg:'#3A2A10',tx:'#FCD34D'},{bg:'#102030',tx:'#93C5FD'},
+];
+const CM=[
+  {color:'#F0C040',dim:'#2A2008',icon:'👑',label:'Court 1'},
+  {color:'#3DDC84',dim:'#0E2A1A',icon:'⚔️',label:'Court 2'},
+  {color:'#FF8C42',dim:'#2A1608',icon:'🏸',label:'Court 3'},
+  {color:'#A78BFA',dim:'#1E1030',icon:'🏸',label:'Court 4'},
+  {color:'#60A5FA',dim:'#0E1A30',icon:'🏸',label:'Court 5'},
+  {color:'#F87171',dim:'#2A0E0E',icon:'🏸',label:'Court 6'},
+];
+function cm(n){return CM[(n-1)%CM.length]}
+
+function loadDefs(){try{const d=localStorage.getItem('bminton_ldr_v4');if(d)return JSON.parse(d)}catch(e){}
+  return{courts:3,rounds:8,names:['Alice','Bob','Charlie','Diana','Eve','Frank','Grace','Henry','Iris','Jack','Karen','Leo']}}
+function saveDefs(d){try{localStorage.setItem('bminton_ldr_v4',JSON.stringify(d))}catch(e){}}
+
+let defs=loadDefs();
+let pColors={},allRounds=[],allPlayers=[],maxCourts=3,totalRounds=8;
+let restCount={},winCount={},gamesPlayed={},consecRest={};
+let roundHistory=[],joinedRound={};
+let palIdx=0,setupList=[...defs.names],view='setup',setupTab='players';
+
+// Swap state — only for the latest incomplete round
+let swapSource=null; // {type:'bench'|'court', player, mi, team, idx}
+
+function pal(n){return pColors[n]||PAL[0]}
+function ini(n){return n.trim().split(/\s+/).map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('')}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function winRate(p){const g=gamesPlayed[p]||0;return g===0?0:(winCount[p]||0)/g}
+function assignColor(p){pColors[p]=PAL[palIdx%PAL.length];palIdx++}
+
+/* ============================================================
+   CORE ROUND BUILDING
+   ============================================================ */
+function buildRound(prevRound){
+  if(!prevRound){
+    const sh=shuffle([...allPlayers]);
+    const actual=Math.min(maxCourts,Math.floor(sh.length/4));
+    const matches=[];
+    for(let c=1;c<=actual;c++){
+      const g=shuffle(sh.slice((c-1)*4,c*4));
+      matches.push({court:c,teamA:[g[0],g[3]],teamB:[g[1],g[2]],winner:null});
+    }
+    return{matches,sitting:sh.slice(actual*4)};
+  }
+
+  const lastPlayedCourt={};
+  allRounds.forEach(r=>{r.matches.forEach(m=>{[...m.teamA,...m.teamB].forEach(p=>{lastPlayedCourt[p]=m.court})})});
+
+  const target={};
+  prevRound.matches.forEach(m=>{
+    const winners=m.winner==='A'?m.teamA:m.teamB;
+    const losers =m.winner==='A'?m.teamB:m.teamA;
+    winners.forEach(p=>{ target[p]=Math.max(1,m.court-1) });
+    losers.forEach(p=>{  target[p]=Math.min(maxCourts,m.court+1) });
+  });
+  (prevRound.sitting||[]).forEach(p=>{ target[p]=lastPlayedCourt[p]||maxCourts });
+  allPlayers.forEach(p=>{ if(!(p in target)) target[p]=maxCourts });
+
+  const buckets={};
+  for(let c=1;c<=maxCourts;c++) buckets[c]=[];
+  allPlayers.forEach(p=>{ buckets[Math.min(Math.max(target[p],1),maxCourts)].push(p) });
+
+  const sitting=[];
+  for(let c=1;c<=maxCourts;c++){
+    if(buckets[c].length<=4) continue;
+    buckets[c].sort((a,b)=>{
+      const pa=consecRest[a]>=1?1:0,pb=consecRest[b]>=1?1:0;
+      if(pa!==pb) return pb-pa;
+      return (restCount[b]||0)-(restCount[a]||0);
+    });
+    const overflow=buckets[c].splice(4);
+    if(c<maxCourts) overflow.forEach(p=>buckets[c+1].push(p));
+    else sitting.push(...overflow);
+  }
+  if(buckets[maxCourts].length>4){
+    buckets[maxCourts].sort((a,b)=>{
+      const pa=consecRest[a]>=1?1:0,pb=consecRest[b]>=1?1:0;
+      if(pa!==pb) return pa-pb;
+      return (restCount[a]||0)-(restCount[b]||0);
+    });
+    while(buckets[maxCourts].length>4) sitting.push(buckets[maxCourts].shift());
+  }
+  for(let c=maxCourts;c>=1;c--){
+    if(buckets[c].length>0&&buckets[c].length<4){ sitting.push(...buckets[c]);buckets[c]=[]; }
+  }
+
+  const matches=[];
+  for(let c=1;c<=maxCourts;c++){
+    const grp=buckets[c];if(grp.length!==4) continue;
+    const s=[...grp].sort((a,b)=>winRate(b)-winRate(a)||Math.random()-.5);
+    matches.push({court:c,teamA:[s[0],s[3]],teamB:[s[1],s[2]],winner:null});
+  }
+  matches.sort((a,b)=>a.court-b.court);
+  return{matches,sitting:[...new Set(sitting)]};
+}
+
+function commitRound(round,ri){
+  const playing=new Set(round.matches.flatMap(m=>[...m.teamA,...m.teamB]));
+  allPlayers.forEach(p=>{
+    if(playing.has(p)){gamesPlayed[p]++;consecRest[p]=0}
+    else{restCount[p]++;consecRest[p]++}
+  });
+  roundHistory[ri]=new Set(round.sitting||[]);
+}
+
+function pushRound(prev){
+  const round=buildRound(prev);
+  commitRound(round,allRounds.length);
+  allRounds.push(round);
+  swapSource=null;
+}
+
+function startTournament(){
+  allPlayers=setupList.map((n,i)=>n.trim()||`Player ${i+1}`).filter((n,i,a)=>a.indexOf(n)===i);
+  maxCourts=parseInt(document.getElementById('sCourtNum').value)||1;
+  totalRounds=parseInt(document.getElementById('sGameNum').value)||1;
+  if(allPlayers.length<4){alert('Need at least 4 players.');return;}
+  palIdx=0;pColors={};restCount={};winCount={};gamesPlayed={};consecRest={};
+  roundHistory=[];joinedRound={};allRounds=[];swapSource=null;
+  allPlayers.forEach(p=>{assignColor(p);restCount[p]=0;winCount[p]=0;gamesPlayed[p]=0;consecRest[p]=0;joinedRound[p]=1});
+  pushRound(null);view='tournament';render();window.scrollTo(0,0);
+}
+
+function recWin(ri,mi,winner){
+  allRounds[ri].matches[mi].winner=winner;
+  const round=allRounds[ri];
+  if(round.matches.every(m=>m.winner!==null)){
+    round.matches.forEach(m=>{
+      const w=m.winner==='A'?m.teamA:m.teamB;
+      w.forEach(p=>{winCount[p]=(winCount[p]||0)+1});
+    });
+    if(ri===allRounds.length-1&&allRounds.length<totalRounds) pushRound(round);
+  }
+  render();
+}
+
+function reroll(ri){
+  const round=allRounds[ri];
+  if(round.matches.some(m=>m.winner!==null))return;
+  const prev=new Set(round.matches.flatMap(m=>[...m.teamA,...m.teamB]));
+  allPlayers.forEach(p=>{
+    if(prev.has(p)){gamesPlayed[p]--;consecRest[p]=0}
+    else{restCount[p]--;consecRest[p]=Math.max(0,consecRest[p]-1)}
+  });
+  roundHistory[ri]=new Set();allRounds.splice(ri,1);swapSource=null;
+  pushRound(ri===0?null:allRounds[ri-1]);render();
+}
+
+function addPlayer(){
+  const inp=document.getElementById('newPlayerName');
+  const name=inp.value.trim();if(!name)return;
+  if(allPlayers.includes(name)){showMsg('Already in tournament','w');return;}
+  const avg=Math.round(allPlayers.reduce((s,p)=>s+(restCount[p]||0),0)/Math.max(1,allPlayers.length));
+  allPlayers.push(name);assignColor(name);
+  restCount[name]=avg;winCount[name]=0;gamesPlayed[name]=0;consecRest[name]=0;
+  joinedRound[name]=allRounds.length+1;
+  inp.value='';showMsg(`${name} added`,'ok');render();
+}
+function showMsg(m,t){const el=document.getElementById('addMsg');if(!el)return;el.textContent=m;el.style.color=t==='ok'?'var(--green)':'var(--orange)';setTimeout(()=>{if(el)el.textContent=''},3000)}
+
+/* ============================================================
+   SWAP LOGIC
+   Two-tap swap: tap bench player → tap court player (or vice versa)
+   Can also tap bench→bench to swap two bench players
+   Only works on the current incomplete round
+   ============================================================ */
+function canSwap(){
+  const ri=allRounds.length-1;
+  return ri>=0&&!allRounds[ri].matches.every(m=>m.winner!==null);
+}
+
+function tapBench(player){
+  if(!canSwap()) return;
+  if(swapSource&&swapSource.type==='bench'&&swapSource.player===player){
+    swapSource=null;render();return;
+  }
+  if(swapSource&&swapSource.type==='court'){
+    // Swap: court player → bench, bench player → court
+    doSwap(swapSource,{type:'bench',player});
+    swapSource=null;render();return;
+  }
+  if(swapSource&&swapSource.type==='bench'){
+    // bench ↔ bench: just swap positions in sitting array (cosmetic, no stats change needed)
+    const ri=allRounds.length-1;
+    const round=allRounds[ri];
+    const a=round.sitting.indexOf(swapSource.player);
+    const b=round.sitting.indexOf(player);
+    if(a!==-1&&b!==-1)[round.sitting[a],round.sitting[b]]=[round.sitting[b],round.sitting[a]];
+    swapSource=null;render();return;
+  }
+  swapSource={type:'bench',player};
+  render();
+}
+
+function tapCourt(player,mi,team,idx){
+  if(!canSwap()) return;
+  if(swapSource&&swapSource.type==='court'&&swapSource.player===player){
+    swapSource=null;render();return;
+  }
+  if(swapSource){
+    doSwap(swapSource,{type:'court',player,mi,team,idx});
+    swapSource=null;render();return;
+  }
+  swapSource={type:'court',player,mi,team,idx};
+  render();
+}
+
+function doSwap(a,b){
+  const ri=allRounds.length-1;
+  const round=allRounds[ri];
+  // Get the two players
+  const pA=a.player,pB=b.player;
+
+  // Remove pA from its location, place pB; remove pB from its location, place pA
+  if(a.type==='bench'&&b.type==='court'){
+    // pA is on bench, pB is on court
+    const sIdx=round.sitting.indexOf(pA);
+    if(sIdx!==-1) round.sitting[sIdx]=pB;
+    const match=round.matches[b.mi];
+    if(b.team==='A') match.teamA[b.idx]=pA;
+    else match.teamB[b.idx]=pA;
+  } else if(a.type==='court'&&b.type==='bench'){
+    // pA is on court, pB is on bench
+    const match=round.matches[a.mi];
+    if(a.team==='A') match.teamA[a.idx]=pB;
+    else match.teamB[a.idx]=pB;
+    const sIdx=round.sitting.indexOf(pB);
+    if(sIdx!==-1) round.sitting[sIdx]=pA;
+  } else if(a.type==='court'&&b.type==='court'){
+    // court ↔ court swap
+    const mA=round.matches[a.mi];
+    const mB=round.matches[b.mi];
+    const fromA=a.team==='A'?mA.teamA:mA.teamB;
+    const fromB=b.team==='A'?mB.teamA:mB.teamB;
+    [fromA[a.idx],fromB[b.idx]]=[fromB[b.idx],fromA[a.idx]];
+  }
+
+  // Recompute roundHistory sitting set for this round
+  roundHistory[ri]=new Set(round.sitting);
+}
+
+function cancelSwap(){swapSource=null;render()}
+
+function getMov(ri,p){
+  if(ri===0)return null;
+  const wasSitting=roundHistory[ri-1]?.has(p);
+  const pm=allRounds[ri-1].matches.find(m=>[...m.teamA,...m.teamB].includes(p));
+  const cm2=allRounds[ri].matches.find(m=>[...m.teamA,...m.teamB].includes(p));
+  if(wasSitting)return cm2?'return':null;
+  if(!pm)return null;if(!cm2)return'rest';
+  return cm2.court<pm.court?'up':cm2.court>pm.court?'down':'stay';
+}
+
+/* ============================================================
+   SETUP
+   ============================================================ */
+function saveDefs2(){defs.courts=parseInt(document.getElementById('dC').value)||2;defs.rounds=parseInt(document.getElementById('dR').value)||5;saveDefs(defs);showSMsg('Saved ✓')}
+function addDN(){const inp=document.getElementById('dNI');const n=inp.value.trim();if(!n||defs.names.includes(n)){inp.value='';return}defs.names.push(n);saveDefs(defs);inp.value='';renderSetup()}
+function remDN(i){defs.names.splice(i,1);saveDefs(defs);renderSetup()}
+function applyDefs(){setupList=[...defs.names];document.getElementById('sCourtNum').value=defs.courts;document.getElementById('sGameNum').value=defs.rounds;setupTab='players';renderSetup()}
+function showSMsg(m){const el=document.getElementById('sMsg');if(!el)return;el.textContent=m;el.style.color='var(--green)';setTimeout(()=>{if(el)el.textContent=''},2500)}
+
+function renderSetup(){
+  let h=`<div style="margin-bottom:1.25rem">
+    <div style="font-size:22px;font-weight:600">🏸 Badminton — Court Ladder</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:2px">Win → move up · Lose → move down · Rest = pause at same court</div>
+  </div>
+  <div class="section"><div class="sec-title">Settings</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><label>Courts</label><input type="number" id="sCourtNum" min="1" max="6" value="${defs.courts}" inputmode="numeric"/></div>
+      <div><label>Rounds</label><input type="number" id="sGameNum" min="1" max="30" value="${defs.rounds}" inputmode="numeric"/></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:4px;margin-bottom:12px">
+    <button class="tab ${setupTab==='players'?'active':''}" onclick="setupTab='players';renderSetup()">Players</button>
+    <button class="tab ${setupTab==='defaults'?'active':''}" onclick="setupTab='defaults';renderSetup()">⚙ Defaults</button>
+  </div>`;
+
+  if(setupTab==='players'){
+    h+=`<div class="section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-title" style="margin:0">Players (${setupList.length})</div>
+        <div style="display:flex;gap:6px">
+          <button class="ghost" onclick="setupList=[...defs.names];renderSP()" style="font-size:12px;padding:6px 12px;min-height:36px">↺ Reset</button>
+          <button onclick="addSP()" style="font-size:12px;padding:6px 12px;min-height:36px">+ Add</button>
+        </div>
+      </div>
+      <div id="spList"></div>
+    </div>`;
+  } else {
+    h+=`<div class="section"><div class="sec-title">Default settings</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Saved to this device. Auto-fills every session.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div><label>Default courts</label><input type="number" id="dC" value="${defs.courts}" inputmode="numeric"/></div>
+        <div><label>Default rounds</label><input type="number" id="dR" value="${defs.rounds}" inputmode="numeric"/></div>
+      </div>
+      <label style="margin-bottom:8px">Default players (${defs.names.length})</label>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="dNI" placeholder="Add name…" style="flex:1" onkeydown="if(event.key==='Enter')addDN()"/>
+        <button onclick="addDN()" style="padding:9px 14px;font-size:13px;min-height:44px">Add</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;margin-bottom:14px">
+        ${defs.names.map((n,i)=>`<span class="name-chip">${n}<button onclick="remDN(${i})">✕</button></span>`).join('')}
+        ${!defs.names.length?`<span style="font-size:13px;color:var(--text3)">No defaults</span>`:''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="primary" onclick="saveDefs2()" style="flex:1">Save defaults</button>
+        <button class="ghost" onclick="applyDefs()" style="flex:1">Apply now →</button>
+      </div>
+      <div id="sMsg" style="font-size:12px;min-height:18px;margin-top:8px"></div>
+    </div>`;
+  }
+
+  h+=`<div class="section" style="font-size:13px;color:var(--text2)">
+    <div style="font-weight:600;color:var(--text);margin-bottom:10px">👑 Court ladder rules</div>
+    <div style="display:grid;gap:6px">
+      <div>🏆 <span style="color:var(--green)">Win</span> → move up one court next round</div>
+      <div>😔 <span style="color:var(--red)">Lose</span> → move down one court next round</div>
+      <div>💤 <span style="color:var(--orange)">Rested</span> → guaranteed play, return to same court</div>
+      <div>🔄 <span style="color:var(--blue)">Swap</span> → tap bench player then court player to swap</div>
+    </div>
+  </div>
+  <button class="primary" style="width:100%;padding:14px;font-size:16px" onclick="startTournament()">Start tournament →</button>`;
+
+  document.getElementById('root').innerHTML=h;
+  if(setupTab==='players') renderSP();
+}
+
+function renderSP(){
+  const c=document.getElementById('spList');if(!c)return;c.innerHTML='';
+  setupList.forEach((name,i)=>{
+    const row=document.createElement('div');row.className='p-entry';
+    const pc=PAL[i%PAL.length];
+    row.innerHTML=`<div class="av" style="background:${pc.bg};color:${pc.tx};width:30px;height:30px;font-size:10px">${ini(name||'P'+(i+1))}</div>
+      <input type="text" value="${name}" placeholder="Player ${i+1}" oninput="setupList[${i}]=this.value;renderSP()"/>
+      <button class="rm-btn" onclick="setupList.splice(${i},1);renderSP()">✕</button>`;
+    c.appendChild(row);
+  });
+}
+function addSP(){setupList.push('');renderSP();const inp=document.querySelectorAll('#spList input');inp[inp.length-1]?.focus();inp[inp.length-1]?.scrollIntoView({behavior:'smooth',block:'center'})}
+
+/* ============================================================
+   TOURNAMENT RENDER
+   ============================================================ */
+function renderTournament(){
+  const rounds=allRounds.length;
+  const last=allRounds[rounds-1];
+  const allDone=last.matches.every(m=>m.winner!==null);
+  const complete=allDone&&rounds>=totalRounds;
+  const spread=allPlayers.length?Math.max(...allPlayers.map(p=>restCount[p]))-Math.min(...allPlayers.map(p=>restCount[p])):0;
+  const maxCR=Math.max(...allPlayers.map(p=>consecRest[p]),0);
+  const lastRi=rounds-1;
+  const lastRoundDone=allRounds[lastRi].matches.every(m=>m.winner!==null);
+  const swapActive=swapSource!==null;
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:19px;font-weight:600">🏸 Court Ladder</div>
+      <div style="font-size:12px;color:var(--text2)">R${rounds}/${totalRounds} · ${allPlayers.length}p · ${maxCourts} courts</div>
+    </div>
+    <button class="ghost" onclick="view='setup';setupTab='players';setupList=[...allPlayers];swapSource=null;render()" style="font-size:12px;padding:6px 12px;min-height:36px">← Setup</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+    <div class="m-card"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">SPREAD</div><div style="font-size:20px;font-weight:600;color:${spread<=1?'var(--green)':spread<=2?'var(--orange)':'var(--red)'}">${spread}</div></div>
+    <div class="m-card"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">CONSEC↓</div><div style="font-size:20px;font-weight:600;color:${maxCR===0?'var(--green)':maxCR===1?'var(--orange)':'var(--red)'}">${maxCR}</div></div>
+    <div class="m-card"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">ROUND</div><div style="font-size:20px;font-weight:600">${rounds}/${totalRounds}</div></div>
+    <div class="m-card"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">ACTIVE</div><div style="font-size:20px;font-weight:600;color:var(--blue)">${last.matches.length*4}</div></div>
+  </div>`;
+
+  // Add player panel
+  h+=`<div class="section" style="padding:.75rem;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:500;color:var(--text2)">＋ Add player mid-tournament</span>
+      <button onclick="toggleAdd()" id="addToggle" style="font-size:12px;padding:5px 12px;min-height:34px">Show</button>
+    </div>
+    <div id="addArea" style="display:none;margin-top:10px">
+      <div style="display:flex;gap:8px">
+        <input type="text" id="newPlayerName" placeholder="Player name" onkeydown="if(event.key==='Enter')addPlayer()" style="flex:1"/>
+        <button onclick="addPlayer()" class="primary" style="padding:9px 16px">Add</button>
+      </div>
+      <div id="addMsg" style="font-size:12px;margin-top:6px;min-height:18px"></div>
+    </div>
+  </div>`;
+
+  // Swap hint banner
+  if(swapActive){
+    const who=swapSource.player;
+    const where=swapSource.type==='bench'?'bench':'court';
+    h+=`<div class="swap-hint">
+      <span>💱 <strong>${who}</strong> selected from ${where} — tap another player to swap</span>
+      <button onclick="cancelSwap()">Cancel</button>
+    </div>`;
+  }
+
+  // Rounds
+  allRounds.forEach((round,ri)=>{
+    const newJ=allPlayers.filter(p=>joinedRound[p]===ri+1&&ri>0);
+    const done=round.matches.every(m=>m.winner!==null);
+    const isLast=ri===allRounds.length-1;
+    const swappable=isLast&&!done;
+
+    h+=`<div class="round-lbl">Round ${ri+1}`;
+    h+=ri===0?`<span class="tag tag-blue">random draw</span>`:`<span class="tag tag-yellow">court ladder</span>`;
+    if(newJ.length)h+=`<span class="tag tag-green">+${newJ.join(', ')}</span>`;
+    if(swappable)h+=`<span style="font-size:10px;color:var(--text3);margin-left:auto">tap players to swap</span>`;
+    if(isLast&&!done)h+=`<button onclick="reroll(${ri})" style="font-size:11px;padding:4px 10px;min-height:32px">🔀 Re-roll</button>`;
+    h+=`</div>`;
+
+    // Layout: courts col + bench col
+    h+=`<div class="round-layout">`;
+    h+=`<div class="courts-col">`;
+
+    round.matches.forEach((m,mi)=>{
+      const aWon=m.winner==='A',bWon=m.winner==='B';
+      const meta=cm(m.court);
+
+      h+=`<div class="court-card" style="background:${meta.dim};border-color:${meta.color}55">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${meta.color},transparent)"></div>
+        <div style="font-size:11px;font-weight:600;margin-bottom:8px;color:${meta.color};display:flex;align-items:center;gap:5px">
+          ${meta.icon} ${meta.label}
+          ${m.court===1?`<span style="font-size:9px;padding:1px 5px;border-radius:8px;background:${meta.color}22;color:${meta.color}">TOP</span>`:''}
+        </div>`;
+
+      const renderTeam=(team,teamKey,won,lost)=>{
+        h+=`<div class="${lost?'lost-team':''}">`;
+        team.forEach((p,idx)=>{
+          const c=pal(p);const g=gamesPlayed[p]||0;
+          const wr=g>0?Math.round(winRate(p)*100)+'%':'—';
+          const isNew=joinedRound[p]>1;
+          const mv=getMov(ri,p);
+          const mvHtml=
+            mv==='up'    ?`<span style="color:var(--green);font-size:12px;font-weight:700">↑</span>`:
+            mv==='down'  ?`<span style="color:var(--red);font-size:12px;font-weight:700">↓</span>`:
+            mv==='return'?`<span style="color:var(--orange);font-size:11px">↩</span>`:
+            mv==='stay'  ?`<span style="color:var(--text3);font-size:11px">—</span>`:'';
+          const prot=consecRest[p]>=1?`<span style="font-size:9px">💤</span>`:'';
+
+          const isSwapSrc=swapSource&&swapSource.player===p;
+          const isSwapTgt=swapSource&&swapSource.player!==p&&swappable;
+          const chipCls=isSwapSrc?'player-chip swap-source':isSwapTgt?'player-chip swap-target':'player-chip';
+          const clickFn=swappable?`onclick="tapCourt('${p.replace(/'/g,"\\'")}',${mi},'${teamKey}',${idx})"`:''
+
+          h+=`<div class="${chipCls}" ${clickFn} style="${swappable?'cursor:pointer':'cursor:default'}">
+            <div class="av" style="background:${c.bg};color:${c.tx};width:26px;height:26px;font-size:9px">${ini(p)}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}${isNew?` <span class="tag tag-green" style="font-size:8px">new</span>`:''}</div>
+              <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">${wr}</div>
+            </div>
+            ${prot}${mvHtml}
+            ${won?`<span style="font-size:12px;margin-left:2px">🏆</span>`:''}
+          </div>`;
+        });
+        h+=`</div>`;
+      };
+
+      renderTeam(m.teamA,'A',aWon,bWon);
+      h+=`<div class="vs-badge">VS</div>`;
+      renderTeam(m.teamB,'B',bWon,aWon);
+
+      if(!m.winner){
+        const an=m.teamA.map(p=>p.split(' ')[0]).join(' & ');
+        const bn=m.teamB.map(p=>p.split(' ')[0]).join(' & ');
+        const promo=m.court>1?` →C${m.court-1}`:'';
+        h+=`<div style="display:flex;gap:5px;margin-top:8px">
+          <button class="win-btn" onclick="recWin(${ri},${mi},'A')">${an}${promo}</button>
+          <button class="win-btn" onclick="recWin(${ri},${mi},'B')">${bn}${promo}</button>
+        </div>`;
+      } else {
+        const wNext=m.court===1?'stays 👑':` →C${m.court-1} ↑`;
+        const lNext=m.court===maxCourts?`stays C${maxCourts}`:` →C${m.court+1} ↓`;
+        h+=`<div style="margin-top:8px;display:grid;gap:2px">
+          <div style="font-size:11px;color:var(--green)">🏆 Winners${wNext}</div>
+          <div style="font-size:11px;color:var(--red)">😔 Losers${lNext}</div>
+        </div>`;
+      }
+      h+=`</div>`;
+    });
+
+    h+=`</div>`; // end courts-col
+
+    // ---- BENCH PANEL ----
+    h+=`<div class="bench-col"><div class="bench-panel">`;
+    h+=`<div class="bench-title">⏸ Bench</div>`;
+
+    if(round.sitting&&round.sitting.length>0){
+      round.sitting.forEach(p=>{
+        const c=pal(p);
+        const cr=consecRest[p]||0;
+        const isSelected=swapSource&&swapSource.player===p&&swapSource.type==='bench';
+        const isTarget=swapSource&&swapSource.player!==p&&swappable;
+        const clickFn=swappable?`onclick="tapBench('${p.replace(/'/g,"\\'")}')"`:'';
+        h+=`<div class="bench-player${isSelected?' selected':''}" ${clickFn} style="${!swappable?'cursor:default':''}">
+          <div class="av" style="background:${c.bg};color:${c.tx};width:22px;height:22px;font-size:8px;flex-shrink:0">${ini(p)}</div>
+          <div style="flex:1;min-width:0">
+            <div class="bname">${p}</div>
+            ${cr>=1?`<div class="bcr">💤${cr}×</div>`:''}
+          </div>
+        </div>`;
+      });
+    } else {
+      h+=`<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">All playing</div>`;
+    }
+    h+=`</div></div>`; // end bench-panel, bench-col
+
+    h+=`</div>`; // end round-layout
+    h+=`<div style="height:10px"></div>`;
+  });
+
+  if(complete)h+=`<div style="background:linear-gradient(135deg,var(--yellow-dim),var(--blue-dim));border:1px solid var(--yellow);border-radius:var(--radius);padding:1rem;text-align:center;margin-top:.5rem"><div style="font-size:18px;font-weight:600;color:var(--yellow)">👑 Tournament complete!</div><div style="font-size:13px;color:var(--text2);margin-top:4px">${totalRounds} rounds finished</div></div>`;
+
+  h+=`<div class="divider"></div>`;
+
+  // Court ladder table
+  const sRi=Math.max(0,rounds-6);
+  h+=`<div class="section"><div class="sec-title">Court ladder table</div><div style="overflow-x:auto"><table class="rt-table"><thead><tr><th></th><th>Player</th>`;
+  for(let ri=sRi;ri<rounds;ri++) h+=`<th>R${ri+1}</th>`;
+  h+=`<th>Rest</th><th>CR</th><th>C1×</th><th>W%</th></tr></thead><tbody>`;
+
+  const avgC={};
+  allPlayers.forEach(p=>{
+    const cs=allRounds.flatMap(r=>{const m=r.matches.find(m=>[...m.teamA,...m.teamB].includes(p));return m?[m.court]:[]});
+    avgC[p]=cs.length?cs.reduce((a,b)=>a+b,0)/cs.length:99;
+  });
+
+  [...allPlayers].sort((a,b)=>avgC[a]-avgC[b]).forEach(p=>{
+    const c=pal(p);const joinRi=joinedRound[p]-1;
+    const r=restCount[p]||0,cr=consecRest[p]||0;
+    const w=winCount[p]||0,g=gamesPlayed[p]||0;
+    const wr=g>0?Math.round(w/g*100)+'%':'—';
+    const c1=allRounds.filter(r=>r.matches.find(m=>m.court===1&&[...m.teamA,...m.teamB].includes(p))).length;
+    h+=`<tr><td><div class="av" style="background:${c.bg};color:${c.tx};width:20px;height:20px;font-size:8px">${ini(p)}</div></td><td style="font-weight:500">${p}</td>`;
+    for(let ri=sRi;ri<rounds;ri++){
+      if(ri<joinRi){h+=`<td><span class="dot-na"></span></td>`;continue}
+      const sat=roundHistory[ri]?.has(p);
+      if(sat){h+=`<td><span class="dot-rest"></span></td>`;continue}
+      const match=allRounds[ri].matches.find(m=>[...m.teamA,...m.teamB].includes(p));
+      if(!match){h+=`<td>—</td>`;continue}
+      const meta=cm(match.court);
+      h+=`<td><span style="font-size:11px;font-weight:700;color:${meta.color}">${match.court}</span></td>`;
+    }
+    h+=`<td style="font-weight:600;color:${r>0?'var(--orange)':'var(--green)'}">${r}</td>
+      <td>${cr>=2?`<span class="consec-warn">${cr}</span>`:cr===1?`<span class="consec-warn-y">${cr}</span>`:`<span class="consec-ok">0</span>`}</td>
+      <td style="color:var(--yellow);font-weight:600">${c1}</td>
+      <td style="color:var(--text2)">${wr}</td></tr>`;
+  });
+  h+=`</tbody></table></div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--text3);flex-wrap:wrap">
+      <span>Number = court that round · sorted by avg (best first)</span>
+      <span><span class="dot-rest" style="margin-right:3px;vertical-align:middle"></span>Rested · C1× = times on Court 1</span>
+    </div></div>`;
+
+  if(allRounds.some(r=>r.matches.some(m=>m.winner))){
+    h+=`<div class="section" style="margin-top:10px"><div class="sec-title">Win stats</div>`;
+    [...allPlayers].sort((a,b)=>winRate(b)-winRate(a)).forEach(p=>{
+      const c=pal(p);const w=winCount[p]||0,g=gamesPlayed[p]||0,wr=g>0?Math.round(w/g*100):0;
+      h+=`<div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+        <div class="av" style="background:${c.bg};color:${c.tx};width:24px;height:24px;font-size:9px">${ini(p)}</div>
+        <span style="min-width:80px;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</span>
+        <div class="stat-bar-bg"><div class="stat-bar" style="width:${wr}%;background:${c.tx}40;border:1px solid ${c.tx}60"></div></div>
+        <span style="font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;white-space:nowrap;min-width:76px;text-align:right">${w}W/${g}G·${wr}%</span>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  document.getElementById('root').innerHTML=h;
+}
+
+function toggleAdd(){
+  const a=document.getElementById('addArea'),b=document.getElementById('addToggle');if(!a)return;
+  const shown=a.style.display==='block';a.style.display=shown?'none':'block';b.textContent=shown?'Show':'Hide';
+  if(!shown)document.getElementById('newPlayerName')?.focus();
+}
+function render(){view==='setup'?renderSetup():renderTournament()}
+render();
+</script>
+</body>
+</html>
