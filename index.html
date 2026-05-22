@@ -417,6 +417,36 @@ function recWin(ri,mi,winner){
   render();
 }
 
+function undoWinner(ri,mi){
+  const round=allRounds[ri];
+  const m=round.matches[mi];
+  if(!m.winner) return; // nothing to undo
+
+  // If this was the last match that triggered a new round, remove that new round
+  const wasLastMatch=round.matches.every(mx=>mx.winner!==null);
+  if(wasLastMatch && ri===allRounds.length-2){
+    // The next round was already built — undo it
+    const nextRound=allRounds[allRounds.length-1];
+    // Undo commitRound for the next round
+    const nextPlaying=new Set(nextRound.matches.flatMap(m=>[...m.teamA,...m.teamB]));
+    allPlayers.forEach(p=>{
+      if(nextPlaying.has(p)){gamesPlayed[p]--;consecRest[p]=0}
+      else{restCount[p]--;consecRest[p]=Math.max(0,consecRest[p]-1)}
+    });
+    roundHistory.pop();
+    allRounds.pop();
+  }
+
+  // Undo winCount for the winner of this match
+  const prevWinners=m.winner==='A'?m.teamA:m.teamB;
+  prevWinners.forEach(p=>{winCount[p]=Math.max(0,(winCount[p]||0)-1)});
+
+  // Clear the winner
+  m.winner=null;
+  swapSource=null;
+  render();
+}
+
 function reroll(ri){
   const round=allRounds[ri];
   if(round.matches.some(m=>m.winner!==null))return;
@@ -886,9 +916,12 @@ function renderTournament(){
       } else {
         const wNext=m.court===1?'stays 👑':` →C${m.court-1} ↑`;
         const lNext=m.court===maxCourts?`stays C${maxCourts}`:` →C${m.court+1} ↓`;
-        h+=`<div style="margin-top:8px;display:grid;gap:2px">
+        h+=`<div style="margin-top:8px;display:grid;gap:4px">
           <div style="font-size:11px;color:var(--green)">🏆 Winners${wNext}</div>
           <div style="font-size:11px;color:var(--red)">😔 Losers${lNext}</div>
+          <button onclick="undoWinner(${ri},${mi})" style="margin-top:4px;font-size:11px;padding:4px 10px;min-height:30px;background:transparent;border-color:var(--border);color:var(--text3);border-radius:var(--radius-sm);display:flex;align-items:center;gap:4px">
+            ↩ Undo result
+          </button>
         </div>`;
       }
       h+=`</div>`;
